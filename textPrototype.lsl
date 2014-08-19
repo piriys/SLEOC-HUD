@@ -16,9 +16,32 @@ integer LAST_UPPERCASE_INDEX = 90;
 integer FIRST_NUMERIC_INDEX = 48;    //Starts at 0
 integer LAST_NUMERIC_INDEX = 57;     //Ends at 9
 
-ChangeBlockTexture(string character, integer blockIndex)
+vector GetRowColumnIndex(string character)
 {
-
+    integer asciNumber = GetASCINumber(character);
+    integer columnIndex = FIRST_COLUMN;
+    
+    vector rowColumnIndex = <0.0, 0.0, 0.0>;
+    
+    if(asciNumber >= FIRST_NUMERIC_INDEX & asciNumber <= LAST_NUMERIC_INDEX)
+    {
+        rowColumnIndex.y = NUMERIC/8.0;
+        columnIndex = asciNumber - FIRST_NUMERIC_INDEX;
+    }
+    else if(asciNumber >= FIRST_UPPERCASE_INDEX & asciNumber <= LAST_UPPERCASE_INDEX)
+    {
+        rowColumnIndex.y = UPPERCASE/8.0;
+        columnIndex = asciNumber - FIRST_UPPERCASE_INDEX;    
+    }
+    else if(asciNumber >= FIRST_LOWERCASE_INDEX & asciNumber <= LAST_LOWERCASE_INDEX)
+    {
+        rowColumnIndex.y = LOWERCASE/8.0;    
+        columnIndex = asciNumber - FIRST_LOWERCASE_INDEX;        
+    }
+    
+    rowColumnIndex.x = (columnIndex * 2 + FIRST_COLUMN)/52.0;
+    
+    return rowColumnIndex;
 }
 
 integer GetASCINumber(string character) // 0 - 126 ASCII printable characters only
@@ -46,15 +69,13 @@ default
             FRONT_FACE, 
             ROBOTO_THIN, 
             <1/26.0, 1/4.0, 0.0>,   //Repeat
-            <-25/52.0, UPPERCASE/8.0, 0.0>,   //Offset
+            GetRowColumnIndex("G"),   //Offset
             0.0
             ]);
     }
     
     touch_start(integer num_detected)
     {
-        llOwnerSay((string) (GetASCINumber("1")));
-        llOwnerSay((string) (GetASCINumber("9")));
-        llOwnerSay((string) (GetASCINumber("0")));          
+       
     }
 }
