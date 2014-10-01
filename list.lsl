@@ -22,7 +22,7 @@ list ITEMS =
 /*====================*/
 /*====================*/
 /*Constants*/
-string ADD_API_URL = "http://crimsondash.com/sleoc";
+string ADD_API_URL = "http://crimsondash.com/sleoc/api/cardapi/addcard?";
 string XOR_KEY = "SLEOC6411";
 integer APP_KEY = 6411;
 integer HUD_FRONT_FACE = 4;
@@ -41,7 +41,7 @@ string Dexor(string data)
     return llBase64ToString(llXorBase64(data, llStringToBase64(XOR_KEY)));
 }
 
-string EncryptMosaicListCardParameters()
+string EncryptCardParameters()
 {
     string parameters = "";
 	
@@ -58,8 +58,8 @@ string EncryptMosaicListCardParameters()
         + "&showleftfooter=" + SHOW_LEFT_FOOTER
         + "&showrightfooter=" + SHOW_RIGHT_FOOTER;   	
 	
-    string encryptedParameters = Xor(parameters);    
-    return llEscapeURL(encryptedParameters);    
+    string encryptedParameters = llEscapeURL(parameters);    
+    return Xor(encryptedParameters);   
 }
 
 default
@@ -67,8 +67,8 @@ default
     touch_end(integer num_detected)
     {
         key avatarKey = llDetectedKey(0);
-		parameters = "key=" + (string)avatarKey + "&type=" + CARD_TYPE + "&encrypted=" + EncryptMosaicListCardParameters();
-		llReleaseURL(ADD_API_URL);
-		requestCard = llHTTPRequest(ADD_API_URL, [HTTP_METHOD,"POST", HTTP_MIMETYPE,"application/x-www-form-urlencoded"], parameters); 
-    }
+        string parameters = "key=" + (string)avatarKey + "&type=" + CARD_TYPE + "&encrypted=" + EncryptCardParameters();
+        llReleaseURL(ADD_API_URL);
+        requestCard = llHTTPRequest(ADD_API_URL + parameters, [HTTP_METHOD,"POST", HTTP_MIMETYPE,"application/x-www-form-urlencoded"], ""); 
+    }    
 }
