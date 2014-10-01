@@ -5,15 +5,9 @@ string RIGHT_FOOTER = "Right Footer";
 string SHOW_LEFT_FOOTER = "true";
 string SHOW_RIGHT_FOOTER = "true";
 
-/*Hybrid Mosaic Card Settings - Make Changes Here*/
+/*Mosaic Text Card Settings - Make Changes Here*/
+string TITLE = "Title";
 string DESCRIPTION = "Description";
-list IMAGE_URLS = 
-[
-"http://crimsondash.com/SLEOC/Content/images/defaultimage.png",
-"http://crimsondash.com/SLEOC/Content/images/defaultimage.png",
-"http://crimsondash.com/SLEOC/Content/images/defaultimage.png",
-"http://crimsondash.com/SLEOC/Content/images/defaultimage.png"
-];
 
 /*====================*/
 /*====================*/
@@ -28,7 +22,7 @@ string ADD_API_URL = "http://crimsondash.com/sleoc";
 string XOR_KEY = "SLEOC6411";
 integer APP_KEY = 6411;
 integer HUD_FRONT_FACE = 4;
-string CARD_TYPE = "hybridmosaic";
+string CARD_TYPE = "text";
 /*Global Variables*/
 integer ready = FALSE;
 key requestCard;
@@ -46,20 +40,14 @@ string Dexor(string data)
 string EncryptMosaicListCardParameters()
 {
     string parameters = 
-		"description=" + DESCRIPTION;
-	
-    integer i = 0;	
-	
-    for(i = 0; i < llGetListLength(IMAGE_URLS); i++)
-    {
-        parameters += "&imageurl=" + llList2String(IMAGE_URLS, i);
-    }
-	
-	parameters +=
-        + "&leftfooter=" + LEFT_FOOTER
+		"title=" + TITLE
+		+ "&description=" + DESCRIPTION;
+		
+	parameters += 
+        "&leftfooter=" + LEFT_FOOTER
         + "&rightfooter=" + RIGHT_FOOTER
         + "&showleftfooter=" + SHOW_LEFT_FOOTER
-        + "&showrightfooter=" + SHOW_RIGHT_FOOTER;      
+        + "&showrightfooter=" + SHOW_RIGHT_FOOTER;    
     
     string encryptedParameters = Xor(parameters);    
     return llEscapeURL(encryptedParameters);    

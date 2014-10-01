@@ -29,7 +29,7 @@ string ADD_API_URL = "http://crimsondash.com/sleoc";
 string XOR_KEY = "SLEOC6411";
 integer APP_KEY = 6411;
 integer HUD_FRONT_FACE = 4;
-string CARD_TYPE = "MosaicList";
+string CARD_TYPE = "mosaictext";
 /*Global Variables*/
 integer ready = FALSE;
 key requestCard;
@@ -49,14 +49,14 @@ string EncryptMosaicListCardParameters()
     string parameters = 
 		"title=" + TITLE
 		+ "&description=" + DESCRIPTION;
-    
+
     integer i = 0;
     
     for(i = 0; i < llGetListLength(IMAGE_URLS); i++)
     {
         parameters += "&imageurl=" + llList2String(IMAGE_URLS, i);
-    } 
-    
+    }
+		
 	parameters += 
         "&leftfooter=" + LEFT_FOOTER
         + "&rightfooter=" + RIGHT_FOOTER

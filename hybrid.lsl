@@ -22,7 +22,7 @@ string ADD_API_URL = "http://crimsondash.com/sleoc";
 string XOR_KEY = "SLEOC6411";
 integer APP_KEY = 6411;
 integer HUD_FRONT_FACE = 4;
-string CARD_TYPE = "MosaicList";
+string CARD_TYPE = "hybrid";
 /*Global Variables*/
 integer ready = FALSE;
 key requestCard;
