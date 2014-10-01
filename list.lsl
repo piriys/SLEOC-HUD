@@ -5,12 +5,13 @@ string RIGHT_FOOTER = "Right Footer";
 string SHOW_LEFT_FOOTER = "true";
 string SHOW_RIGHT_FOOTER = "true";
 
-/*Author Card Settings - Make Changes Here*/
-string NAME = "Name";
-string LOCATION = "Location";
-string DESCRIPTION = "Description";
-string PROFILE_IMAGE_URL = "http://crimsondash.com/SLEOC/Content/images/defaultprofileimage.png";
-string IMAGE_URL = "http://crimsondash.com/SLEOC/Content/images/defaultimage.png";
+/*List Card Settings - Make Changes Here*/
+list ITEMS =
+[
+"Item 1",
+"Item 2",
+"Item 3"
+];
 
 /*====================*/
 /*====================*/
@@ -42,18 +43,21 @@ string Dexor(string data)
 
 string EncryptMosaicListCardParameters()
 {
-    string parameters = 
-		"profileimageurl=" + PROFILE_IMAGE_URL 
-		+ "&imageurl=" + IMAGE_URL 
-		+ "&name=" + NAME
-		+ "&location=" + LOCATION	
-		+ "&description=" + DESCRIPTION
-		
-        + "&leftfooter=" + LEFT_FOOTER
+    string parameters = "";
+	
+    integer i = 0;
+     
+    for(i = 0; i < llGetListLength(ITEMS); i++)
+    {
+        parameters += "&item=" + llList2String(ITEMS, i);
+    }      
+    
+	parameters += 
+        "&leftfooter=" + LEFT_FOOTER
         + "&rightfooter=" + RIGHT_FOOTER
         + "&showleftfooter=" + SHOW_LEFT_FOOTER
-        + "&showrightfooter=" + SHOW_RIGHT_FOOTER;      
-    
+        + "&showrightfooter=" + SHOW_RIGHT_FOOTER;   	
+	
     string encryptedParameters = Xor(parameters);    
     return llEscapeURL(encryptedParameters);    
 }

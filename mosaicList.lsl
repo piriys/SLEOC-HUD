@@ -58,11 +58,7 @@ string Dexor(string data)
 string EncryptMosaicListCardParameters()
 {
     string parameters = 
-		"title=" + TITLE
-        + "&leftfooter=" + LEFT_FOOTER
-        + "&rightfooter=" + RIGHT_FOOTER
-        + "&showleftfooter=" + SHOW_LEFT_FOOTER
-        + "&showrightfooter=" + SHOW_RIGHT_FOOTER;   
+		"title=" + TITLE;
     
     integer i = 0;
     
@@ -81,6 +77,12 @@ string EncryptMosaicListCardParameters()
         parameters += "&item=" + llList2String(ITEMS, i);
     }      
     
+	parameters += 
+        "&leftfooter=" + LEFT_FOOTER
+        + "&rightfooter=" + RIGHT_FOOTER
+        + "&showleftfooter=" + SHOW_LEFT_FOOTER
+        + "&showrightfooter=" + SHOW_RIGHT_FOOTER;   	
+	
     string encryptedParameters = Xor(parameters);    
     return llEscapeURL(encryptedParameters);    
 }

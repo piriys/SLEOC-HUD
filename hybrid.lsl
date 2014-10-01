@@ -5,11 +5,8 @@ string RIGHT_FOOTER = "Right Footer";
 string SHOW_LEFT_FOOTER = "true";
 string SHOW_RIGHT_FOOTER = "true";
 
-/*Author Card Settings - Make Changes Here*/
-string NAME = "Name";
-string LOCATION = "Location";
+/*Hybrid Card Settings - Make Changes Here*/
 string DESCRIPTION = "Description";
-string PROFILE_IMAGE_URL = "http://crimsondash.com/SLEOC/Content/images/defaultprofileimage.png";
 string IMAGE_URL = "http://crimsondash.com/SLEOC/Content/images/defaultimage.png";
 
 /*====================*/
@@ -43,10 +40,7 @@ string Dexor(string data)
 string EncryptMosaicListCardParameters()
 {
     string parameters = 
-		"profileimageurl=" + PROFILE_IMAGE_URL 
-		+ "&imageurl=" + IMAGE_URL 
-		+ "&name=" + NAME
-		+ "&location=" + LOCATION	
+		"imageurl=" + IMAGE_URL 
 		+ "&description=" + DESCRIPTION
 		
         + "&leftfooter=" + LEFT_FOOTER

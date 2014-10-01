@@ -5,12 +5,15 @@ string RIGHT_FOOTER = "Right Footer";
 string SHOW_LEFT_FOOTER = "true";
 string SHOW_RIGHT_FOOTER = "true";
 
-/*Author Card Settings - Make Changes Here*/
-string NAME = "Name";
-string LOCATION = "Location";
+/*Hybrid Mosaic Card Settings - Make Changes Here*/
 string DESCRIPTION = "Description";
-string PROFILE_IMAGE_URL = "http://crimsondash.com/SLEOC/Content/images/defaultprofileimage.png";
-string IMAGE_URL = "http://crimsondash.com/SLEOC/Content/images/defaultimage.png";
+list IMAGE_URLS = 
+[
+"http://crimsondash.com/SLEOC/Content/images/defaultimage.png",
+"http://crimsondash.com/SLEOC/Content/images/defaultimage.png",
+"http://crimsondash.com/SLEOC/Content/images/defaultimage.png",
+"http://crimsondash.com/SLEOC/Content/images/defaultimage.png"
+];
 
 /*====================*/
 /*====================*/
@@ -43,12 +46,16 @@ string Dexor(string data)
 string EncryptMosaicListCardParameters()
 {
     string parameters = 
-		"profileimageurl=" + PROFILE_IMAGE_URL 
-		+ "&imageurl=" + IMAGE_URL 
-		+ "&name=" + NAME
-		+ "&location=" + LOCATION	
-		+ "&description=" + DESCRIPTION
-		
+		"description=" + DESCRIPTION;
+	
+    integer i = 0;	
+	
+    for(i = 0; i < llGetListLength(IMAGE_URLS); i++)
+    {
+        parameters += "&imageurl=" + llList2String(IMAGE_URLS, i);
+    }
+	
+	parameters +=
         + "&leftfooter=" + LEFT_FOOTER
         + "&rightfooter=" + RIGHT_FOOTER
         + "&showleftfooter=" + SHOW_LEFT_FOOTER
