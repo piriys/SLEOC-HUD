@@ -1,4 +1,8 @@
 /*See documentation: http://piriysdev.wordpress.com/sleoc-documentation/
+/*Send Options*/
+integer USE_CUSTOM_TARGET = FALSE; //Set to true if target avatar is not the avatar that touches this object
+key CUSTOM_TARGET_KEY = NULL_KEY;
+
 /*Default Card Settings - Make Changes Here*/
 string LEFT_FOOTER = "Left Footer";
 string RIGHT_FOOTER = "Right Footer";
@@ -9,10 +13,10 @@ string SHOW_RIGHT_FOOTER = "true";
 string DESCRIPTION = "Description";
 list IMAGE_URLS = 
 [
-"http://crimsondash.com/SLEOC/Content/images/defaultimage.png",
-"http://crimsondash.com/SLEOC/Content/images/defaultimage.png",
-"http://crimsondash.com/SLEOC/Content/images/defaultimage.png",
-"http://crimsondash.com/SLEOC/Content/images/defaultimage.png"
+"http://crimsondash.com/sleoci/Content/images/defaultimage.png",
+"http://crimsondash.com/sleoci/Content/images/defaultimage.png",
+"http://crimsondash.com/sleoci/Content/images/defaultimage.png",
+"http://crimsondash.com/sleoci/Content/images/defaultimage.png"
 ];
 
 /*====================*/
@@ -24,7 +28,7 @@ list IMAGE_URLS =
 /*====================*/
 /*====================*/
 /*Constants*/
-string ADD_API_URL = "http://crimsondash.com/sleoc/api/cardapi/addcard?";
+string ADD_API_URL = "http://crimsondash.com/sleoci/api/cardapi/addcard?";
 string XOR_KEY = "SLEOC6411";
 integer APP_KEY = 6411;
 integer HUD_FRONT_FACE = 4;
@@ -67,11 +71,20 @@ string EncryptCardParameters()
 
 default
 {
+    state_entry()
+    {
+        llSetText("Card Type: " + CARD_TYPE, <1.0, 1.0, 1.0>, 1.0);       
+    }
     touch_end(integer num_detected)
     {
-        key avatarKey = llDetectedKey(0);
+        key avatarKey = CUSTOM_TARGET_KEY;
+        
+        if(!USE_CUSTOM_TARGET) {
+            avatarKey = llDetectedKey(0);
+        }
+    
         string parameters = "key=" + (string)avatarKey + "&type=" + CARD_TYPE + "&encrypted=" + EncryptCardParameters();
         llReleaseURL(ADD_API_URL);
         requestCard = llHTTPRequest(ADD_API_URL + parameters, [HTTP_METHOD,"POST", HTTP_MIMETYPE,"application/x-www-form-urlencoded"], ""); 
-    }    
+    }
 }

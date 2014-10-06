@@ -9,13 +9,9 @@ string RIGHT_FOOTER = "Right Footer";
 string SHOW_LEFT_FOOTER = "true";
 string SHOW_RIGHT_FOOTER = "true";
 
-/*List Card Settings - Make Changes Here*/
-list ITEMS =
-[
-"Item 1",
-"Item 2",
-"Item 3"
-];
+/*Video Card Settings - Make Changes Here*/
+string VIDEO = "9Eabp3Jpy-I";
+string AUTOPLAY = "true";
 
 /*====================*/
 /*====================*/
@@ -30,7 +26,7 @@ string ADD_API_URL = "http://crimsondash.com/sleoci/api/cardapi/addcard?";
 string XOR_KEY = "SLEOC6411";
 integer APP_KEY = 6411;
 integer HUD_FRONT_FACE = 4;
-string CARD_TYPE = "list";
+string CARD_TYPE = "video";
 /*Global Variables*/
 integer ready = FALSE;
 key requestCard;
@@ -47,21 +43,16 @@ string Dexor(string data)
 
 string EncryptCardParameters()
 {
-    string parameters = "";
-	
-    integer i = 0;
-     
-    for(i = 0; i < llGetListLength(ITEMS); i++)
-    {
-        parameters += "&item=" + llList2String(ITEMS, i);
-    }      
-    
-	parameters += 
+    string parameters = 
+        "video=" + VIDEO
+        + "&autoplay" + AUTOPLAY;
+        
+    parameters += 
         "&leftfooter=" + LEFT_FOOTER
         + "&rightfooter=" + RIGHT_FOOTER
         + "&showleftfooter=" + SHOW_LEFT_FOOTER
-        + "&showrightfooter=" + SHOW_RIGHT_FOOTER;   	
-	
+        + "&showrightfooter=" + SHOW_RIGHT_FOOTER;    
+    
     string encryptedParameters = llEscapeURL(parameters);    
     return Xor(encryptedParameters);   
 }
