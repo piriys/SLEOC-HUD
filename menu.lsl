@@ -1,3 +1,4 @@
+string VERSION = "1.0.2";
 string ADD_API_URL = "http://crimsondash.com/sleoci/api/cardapi/addcard?";
 string PREVIEW_API_URL = "http://crimsondash.com/sleoci/encryptedcard?";
 string XOR_KEY = "SLEOC6411";
@@ -5,9 +6,9 @@ integer APP_KEY = 6411;
 integer MENU_CHANNEL = 6411;
 float TOUCH_HOLD_DELAY = 2.0;
 
-string PROMPT = "--------------------------------\nRead Documentation at http://piriysdev.wordpress.com/sleoc-documentation/";
+string PROMPT = "--------------------------------\nRead Documentation at http://crimsondash.com/SLEOCi/Documentation/SLEOC_Documentation.pdf";
 list MAIN_OPTIONS = ["[Close]", "[Reset]", "Parameters", "Layout", "Preview"]; 
-list LAYOUT_OPTIONS = ["[Back]", "video", "text", "mosaictext", "mosaiclist", "list", "hybridmosaic", "hybrid", "author"];
+list LAYOUT_OPTIONS = ["video", "text", "mosaictext", "mosaiclist", "list", "hybridmosaic", "hybrid", "author"];
 list LIST_OPTIONS = ["[Back]", "[Add]", "[Delete]"];
 list FOOTER_OPTIONS = ["[Back]", "Show", "Hide"];
 
@@ -21,11 +22,13 @@ integer SET_IMAGE_URL_STRING = 203;
 integer SET_TITLE = 204;
 integer SET_NAME = 205;
 integer SET_LOCATION = 206;
-integer SET_DESCRIPTION = 207;
-integer SET_LEFT_FOOTER = 208;
-integer SET_RIGHT_FOOTER = 219;
-integer SET_SHOW_LEFT_FOOTER = 210;
-integer SET_SHOW_RIGHT_FOOTER = 211;
+integer SET_VIDEO = 207;
+integer SET_DESCRIPTION = 208;
+
+integer SET_LEFT_FOOTER = 209;
+integer SET_RIGHT_FOOTER = 210;
+integer SET_SHOW_LEFT_FOOTER = 211;
+integer SET_SHOW_RIGHT_FOOTER = 212;
 
 integer LABEL_MENU = 301;
 integer ITEM_MENU = 302;
@@ -57,12 +60,13 @@ key requestCard;
 //TEXT              |                   |       |           |Y                  |                   |Y      |       |         |Y          |
 
 /*Specific Card Parameters*/
-string CARD_TYPE = "mosaiclist";
+string CARD_TYPE = "text";
 string PROFILE_IMAGE_URL = "http://crimsondash.com/sleoci/Content/images/defaultprofileimage.png";
 string IMAGE_URL_STRING = "http://crimsondash.com/sleoci/Content/images/defaultimage.png";
 string TITLE = "Title";
 string NAME = "Name";
 string LOCATION = "Location";
+string VIDEO = "4EvNxWhskf8";
 string DESCRIPTION = "Description";
 
 list LABEL = ["Label 1", "Label 2", "Label 3"];
@@ -158,7 +162,11 @@ string EncryptCardParameters()
     {
         parameters += "&title=" + TITLE;    
         parameters += "&description=" + DESCRIPTION;                
-    }    
+    }
+    else if(CARD_TYPE == "video")
+    {
+        parameters += "&video=" + VIDEO;
+    }
     
     string encryptedParameters = llEscapeURL(parameters);    
     return Xor(encryptedParameters);   
@@ -168,13 +176,13 @@ string EncryptCardParameters()
 MainMenu()
 {
     currentState = MAIN;    
-    llDialog(llGetOwner(), "Select options\n" + "Current Layout: " + CARD_TYPE + "\n" + PROMPT, MAIN_OPTIONS, MENU_CHANNEL);  
+    llDialog(llGetOwner(), "Select options\n" + "Current layout: " + CARD_TYPE + "\n" + PROMPT, MAIN_OPTIONS, MENU_CHANNEL);  
 }
 
 ParametersMenu()
 {
     currentState = PARAMETERS;
-    llDialog(llGetOwner(), "Select parameters to modify\n" + PROMPT, parameterOptions, MENU_CHANNEL);         
+    llDialog(llGetOwner(), "Select parameter to modify.\nParameters: \n" + llDumpList2String(parameterOptions, "\n") + "\n" + PROMPT, ["[Back]"] + parameterOptions, MENU_CHANNEL);         
 }
 
 ListMenu()
@@ -197,25 +205,25 @@ ListMenu()
         listType = "image url";   
         listParameter = IMAGE_URL_LIST;            
     }
-    llDialog(llGetOwner(), "Select options to modify " + listType + "\nCurrent Parameter(s):\n" + llDumpList2String(listParameter, "\n") + "\n" + PROMPT, LIST_OPTIONS, MENU_CHANNEL); 
+    llDialog(llGetOwner(), "Add or delete " + listType + " from list.\nCurrent parameter(s):\n" + llDumpList2String(listParameter, "\n") + "\n" + PROMPT, LIST_OPTIONS, MENU_CHANNEL); 
 }
 
 AddToList()
 {
     string listType = "undefined";            
-    if(currentState == DELETE_LABEL)    
+    if(currentState == ADD_LABEL)    
     {
         listType = "label";                
     }
-    else if(currentState == DELETE_ITEM)
+    else if(currentState == ADD_ITEM)
     {
         listType = "item";                    
     }
-    else if(currentState == DELETE_IMAGE_URL_LIST)
+    else if(currentState == ADD_IMAGE_URL_LIST)
     {
         listType = "image url";                    
     }
-    llTextBox(llGetOwner(), "Input new list " + listType + ". Leave textbox field empty to cancel.\n", MENU_CHANNEL);   
+    llTextBox(llGetOwner(), "Input new " + listType + ". Leave textbox field empty to cancel.\n", MENU_CHANNEL);   
 }
 
 ShowFooterMenu()
@@ -318,10 +326,48 @@ ResetParameters()
     llOwnerSay("Parameters reset.");
 }
 
+string GetYoutubeIdFromUrl(string url)
+{
+    integer youtubeIdStartIndex = llSubStringIndex(url, "youtube.com/watch?v=");
+    string endCharacter = "&";
+    
+    if(youtubeIdStartIndex  == -1)
+    {
+        youtubeIdStartIndex = llSubStringIndex(url, "youtu.be/");
+        endCharacter = "?";    
+        
+        if(youtubeIdStartIndex == -1)
+        {
+            llOwnerSay("Invalid url. Reverted to previous value.");
+            return VIDEO;
+        }
+    }
+
+    integer youtubeIdEndIndex  = llSubStringIndex(url, endCharacter) - 1;
+    
+    if(youtubeIdEndIndex == -1)
+    {
+        youtubeIdEndIndex = llStringLength(url) - 1;
+    }    
+    
+    return llGetSubString(url, youtubeIdStartIndex, youtubeIdEndIndex);        
+}
+
 default
+{
+	state_entry()
+	{
+		llOwnerSay("Initializing... Please wait.");
+		MENU_CHANNEL = 0x80000000 | ((integer)("0x"+(string)(llGetOwner())) ^ APP_KEY);
+		state ready;
+	}
+}
+
+state ready
 {
     state_entry()
     {
+        llOwnerSay("SLEOCi object ready. Touch and hold object for " + (string)((integer)TOUCH_HOLD_DELAY) + " seconds to bring up settings menu.");
         llListenRemove(listenHandle);
         llListenRemove(textboxHandle);
     }
@@ -331,7 +377,7 @@ default
         if (llDetectedKey(0) == llGetOwner())    
         {
             llResetTime();        
-            llOwnerSay("Touch and hold for 2 seconds to bring up settings menu.");
+            llOwnerSay("Owner detected. Hold for " + (string)((integer)TOUCH_HOLD_DELAY) + " seconds to bring up settings menu.");
         }
     }
  
@@ -361,19 +407,19 @@ default
             if(message == "Layout")
             {
                 currentState = SET_CARD_TYPE;
-                llDialog(llGetOwner(), "Select Layout\nCurrent Layout: " + CARD_TYPE + "\n" + PROMPT, LAYOUT_OPTIONS, MENU_CHANNEL);
+                llDialog(llGetOwner(), "Select Layout\nCurrent Layout: " + CARD_TYPE + "\n" + PROMPT, "[Back]" + LAYOUT_OPTIONS, MENU_CHANNEL);
             }
             else if (message == "Preview")
             {
                 string parameters = "type=" + CARD_TYPE + "&encrypted=" + EncryptCardParameters();            
-                llInstantMessage(llGetOwner(), "Click on the link below to see card preview: \n" + PREVIEW_API_URL + parameters);
                 MainMenu();
+                llOwnerSay("Click on the link below to see card preview: \n[" + PREVIEW_API_URL + parameters + " Card Preview]");                            
             }
             else if (message == "Parameters")
             {
                 currentState = PARAMETERS;                
-                parameterOptions = ["[Back]"];
-            
+                parameterOptions = [];
+                
                 if(CARD_TYPE == "author")
                 {
                     parameterOptions += "PROFILE_IMAGE_URL";
@@ -412,11 +458,15 @@ default
                 else if(CARD_TYPE == "text")
                 {
                     parameterOptions += "TITLE";    
-                    parameterOptions += "DESCRIPTION";                    
+                    parameterOptions += "DESCRIPTION";                 
+                }
+                else if(CARD_TYPE == "video")
+                {
+                    parameterOptions += "VIDEO";   
                 }
                 
                 parameterOptions +=    ["LEFT_FOOTER", "RIGHT_FOOTER", "SHOW_LEFT_FOOTER", "SHOW_RIGHT_FOOTER"];
-                llDialog(llGetOwner(), "Select Parameters\n" + PROMPT, parameterOptions, MENU_CHANNEL);                            
+                ParametersMenu();                     
             }
             else if(message == "[Reset]")
             {
@@ -470,6 +520,11 @@ default
                 currentState = SET_LOCATION;
                 llTextBox(llGetOwner(), "Input new location. Leave textbox field empty to cancel.\nCurrent value: " + LOCATION, MENU_CHANNEL);               
             }
+            else if(message == "VIDEO")
+            {
+                currentState = SET_VIDEO;
+                llTextBox(llGetOwner(), "Input new youtube video url. Leave textbox field empty to cancel.\nCurrent value: " + VIDEO, MENU_CHANNEL);                
+            }
             else if(message == "DESCRIPTION")
             {
                 currentState = SET_DESCRIPTION;
@@ -504,8 +559,15 @@ default
         {
             if(message != "[Back]")
             {
-                CARD_TYPE = message;
-                llOwnerSay("Card layout set. Current layout: " + CARD_TYPE);
+                if(llListFindList(LAYOUT_OPTIONS, [message]) != -1)
+                {
+                    CARD_TYPE = message;
+                    llOwnerSay("Card layout set. Current layout: " + CARD_TYPE);
+                }
+                else
+                {
+                    llOwnerSay("Invalid layout. Current layout: " + CARD_TYPE);                
+                }
             }
             
             MainMenu();            
@@ -524,6 +586,8 @@ default
                     NAME = message;
                 else if(currentState == SET_LOCATION)
                     LOCATION = message;
+                else if(currentState == SET_VIDEO)
+                    VIDEO = GetYoutubeIdFromUrl(message);
                 else if(currentState == SET_DESCRIPTION)
                     DESCRIPTION = message;
                 else if(currentState == SET_LEFT_FOOTER)
@@ -555,12 +619,12 @@ default
         {
             if(message == "Show")
             {
-                SHOW_LEFT_FOOTER = "true";
+                SHOW_RIGHT_FOOTER = "true";
                 llOwnerSay("Parameter updated. Current settings: show right footer.");
             }
             else if(message == "Hide")
             {
-                SHOW_LEFT_FOOTER = "false";            
+                SHOW_RIGHT_FOOTER = "false";            
                 llOwnerSay("Parameter updated. Current settings: hide right footer.");              
             }
             
