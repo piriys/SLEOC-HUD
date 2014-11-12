@@ -2,11 +2,12 @@ string VERSION = "1.0.2";
 string ADD_API_URL = "http://crimsondash.com/sleoci/api/cardapi/addcard?";
 string PREVIEW_API_URL = "http://crimsondash.com/sleoci/encryptedcard?";
 string XOR_KEY = "SLEOC6411";
+key OBJECT_KEY = NULL_KEY;
 integer APP_KEY = 6411;
 integer MENU_CHANNEL = 6411;
 float TOUCH_HOLD_DELAY = 2.0;
 
-string PROMPT = "--------------------------------\nRead Documentation at http://crimsondash.com/SLEOCi/Documentation/SLEOC_Documentation.pdf";
+string PROMPT = "--------------------------------\nRead Documentation at http://crimsondash.com/SLEOCi/Documentation/SLEOCi_Documentation.pdf";
 list MAIN_OPTIONS = ["[Close]", "[Reset]", "Parameters", "Layout", "Preview"]; 
 list LAYOUT_OPTIONS = ["video", "text", "mosaictext", "mosaiclist", "list", "hybridmosaic", "hybrid", "author"];
 list LIST_OPTIONS = ["[Back]", "[Add]", "[Delete]"];
@@ -176,7 +177,7 @@ string EncryptCardParameters()
 MainMenu()
 {
     currentState = MAIN;    
-    llDialog(llGetOwner(), "Select options\n" + "Current layout: " + CARD_TYPE + "\n" + PROMPT, MAIN_OPTIONS, MENU_CHANNEL);  
+    llDialog(llGetOwner(), "Select options\n" + "Current layout: " + CARD_TYPE + "\n" + "Object Key: " + (string)OBJECT_KEY + "\n" +  PROMPT, MAIN_OPTIONS, MENU_CHANNEL);  
 }
 
 ParametersMenu()
@@ -355,12 +356,13 @@ string GetYoutubeIdFromUrl(string url)
 
 default
 {
-	state_entry()
-	{
-		llOwnerSay("Initializing... Please wait.");
-		MENU_CHANNEL = 0x80000000 | ((integer)("0x"+(string)(llGetOwner())) ^ APP_KEY);
-		state ready;
-	}
+    state_entry()
+    {
+        llOwnerSay("Initializing... Please wait.");
+        OBJECT_KEY = llGenerateKey();
+        MENU_CHANNEL = 0x80000000 | ((integer)("0x"+ (string)(OBJECT_KEY) + (string)(llGetOwner())) ^ APP_KEY);
+        state ready;
+    }
 }
 
 state ready
